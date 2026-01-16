@@ -34,8 +34,8 @@ backlight: pwmleds {
 		label = "LEFT_ENCODER";
 		resolution = <4>;
         steps = <40>;
-        a-gpios = <&gpio1 0 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
-	    b-gpios = <&gpio0 25 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
+        a-gpios = <&gpio0 25 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
+	    b-gpios = <&gpio1 0 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
 		status = "disabled";
 	};
 
