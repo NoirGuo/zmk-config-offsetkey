@@ -1,10 +1,16 @@
+// 引用基础物理布局配置
 #include <physical_layouts.dtsi>
 
 /{
+    // 布局节点名称
     offsetkey_physical_layout: offsetkey_physical_layout {
+    // 使用物理布局驱动
     compatible = "zmk,physical-layout";
+    // 布局显示名称
     display-name = "Default";
+    // 使用基础坐标变换
     transform = <&default_transform>;
+    // 按键坐标，表头几个字母分别代表 宽  高  x坐标 y坐标 旋转角度 旋转中心坐标
         keys  //                     w   h    x    y     rot    rx    ry
             = <&key_physical_attrs 100 100    0    0       0     0     0>
             , <&key_physical_attrs 100 100  100    0       0     0     0>

@@ -1,3 +1,16 @@
+# 用于告诉编译系统，需要编译哪些固件文件
+# board是主控的名称，常用的有nice_nano_v2、nrfmicro_13、seeeduino_xiao_ble等
+# shield是扩展板的名称，也就是键盘名称
+# 对于单体键盘，shield直接用键盘名称即可，如offsetkey
+# 对于分体键盘，shield需要用分体键盘的左右两部分名称，如offsetkey_left和offsetkey_right
+# 如果使用dongle接收器，shield可以用dongle的名称，如offsetkey_dongle
+# 单体键盘加dongle，键盘部分的shield名称保持不变
+# 分体键盘加dongle，键盘部分需要加个特殊后缀，如offsetkey_peripheral_left、offsetkey_peripheral_right，否则会导致编译失败
+# snippet是编译时需要包含的代码片段
+# studio-rpc-usb-uart是ZMK官方提供的用于支持Studio的代码片段
+# 如果是刷过RMK固件的键盘，再刷ZMK固件的时候，需要在snippet中加入nrf52840-nosd的代码片段
+
+# 无dongle的分体键盘
 include:
   - board: eyelash_nano
     shield: offsetkey_left
@@ -7,3 +20,23 @@ include:
     cmake-args: -DCONFIG_ZMK_STUDIO=y -DCONFIG_ZMK_STUDIO_LOCKING=n
   - board: eyelash_nano
     shield: settings_reset
+
+# 有dongle的分体键盘，nosd，因为没有写相关的overlay和conf文件，我把这部分代码都注释掉了，仅做展示，有需要的话把前面的"# "去掉即可（注意有个空格）
+# include:
+#   - board: eyelash_nano
+#     shield: offsetkey_dongle
+#     snippet: studio-rpc-usb-uart nrf52840-nosd
+#     cmake-args: -DCONFIG_ZMK_STUDIO=y -DCONFIG_ZMK_STUDIO_LOCKING=n
+#     artifact-name: offsetkey_dongle_nosd
+#   - board: eyelash_nano
+#     shield: offsetkey_peripheral_left
+#     snippet: nrf52840-nosd
+#     artifact-name: offsetkey_peripheral_left_nosd
+#   - board: eyelash_nano
+#     shield: offsetkey_peripheral_right
+#     snippet: nrf52840-nosd
+#     artifact-name: offsetkey_peripheral_right_nosd
+#   - board: eyelash_nano
+#     shield: settings_reset
+#     snippet: nrf52840-nosd
+#     artifact-name: settings_reset_nosd

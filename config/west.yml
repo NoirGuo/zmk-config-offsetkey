@@ -1,9 +1,11 @@
+# 引用的官方仓库和第三方仓库
+# 可以按需修改、增加和删除，但要注意格式符合要求
 manifest:
   remotes:
     - name: zmkfirmware
-      url-base: https://github.com/zmkfirmware
+      url-base: https://github.com/zmkfirmware # 官方仓库的远程名称
     - name: cormoran
-      url-base: https://github.com/cormoran
+      url-base: https://github.com/cormoran #以下几个都是第三方仓库的远程名称
     - name: kumamuk-git
       url-base: https://github.com/kumamuk-git
     - name: badjeff
@@ -17,38 +19,38 @@ manifest:
     - name: a741725193
       url-base: https://github.com/a741725193
   projects:
-    - name: zmk
-      remote: cormoran
-      revision: v0.3-branch+dya
+    - name: zmk # 仓库名称，如下所示，可以引用同一个人的不同仓库。这个是zmk的基础仓库
+      remote: cormoran # 仓库的远程名称，必须与上面定义的远程名称一致
+      revision: v0.3-branch+dya # 仓库的分支或标签，必须与远程仓库的分支或标签一致
       import: app/west.yml
-    - name: zmk-behavior-runtime-sensor-rotate
+    - name: zmk-behavior-runtime-sensor-rotate # 这个是滚轮相关功能的依赖。远程名称+仓库名称+分支名称就是引用的仓库地址，比如这一部分，最终指向https://github.com/cormoran/zmk-behavior-runtime-sensor-rotate/tree/main 这个地址
       remote: cormoran
       revision: main
-    - name: zmk-module-ble-management
+    - name: zmk-module-ble-management # 蓝牙管理
       remote: cormoran
-      revision: 851661cd21f2aded8ec649da86e01a207dc4b973
-    - name: zmk-module-battery-history
-      remote: cormoran
-      revision: main
-    - name: zmk-module-settings-rpc
+      revision: 851661cd21f2aded8ec649da86e01a207dc4b973 # 仓库的分支的另一种写法，剑心大佬写的，我水平有限，不知道啥原理，有屌大的给解释一下
+    - name: zmk-module-battery-history # 电池历史记录
       remote: cormoran
       revision: main
-    - name: zmk-module-runtime-input-processor
+    - name: zmk-module-settings-rpc # 设置模块
+      remote: cormoran
+      revision: main
+    - name: zmk-module-runtime-input-processor # 输入处理器
       remote: cormoran
       revision: dbf92f764de8b6ffd60bf5850514302875fe2570
-    - name: zmk-pmw3610-driver
+    - name: zmk-pmw3610-driver # pmw3610驱动
       remote: cormoran
       revision: 274c92bec8a0e98499ceff653b8b9bd6486effbe
-    - name: zmk-nice-oled
+    - name: zmk-nice-oled # nice!view驱动
       remote: mctechnology17
       revision: main
-    - name: zmk-board-eyelash
+    - name: zmk-board-eyelash # 睫毛哥的主控板
       remote: eyelash
       revision: main
-    - name: kb_zmk_ps2_mouse_trackpoint_driver
+    - name: kb_zmk_ps2_mouse_trackpoint_driver # 指点杆或者触控板驱动
       remote: infused-kim
       revision: main
-    - name: zmk-tog-io
+    - name: zmk-tog-io # 睫毛哥的io切换驱动
       remote: a741725193
       revision: main
   self:

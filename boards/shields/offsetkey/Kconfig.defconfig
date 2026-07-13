@@ -1,33 +1,45 @@
+# 板定义，这里定义右手
 if SHIELD_OFFSETKEY_RIGHT
 
+# 定义键盘显示名称
 config ZMK_KEYBOARD_NAME
 	default "offsetkey"
 
+# 定义右手为主手，offsetkey引用的3610轨迹球驱动要求球必须在主手。如果是定义左手为主手，最上面那一行RIGHT改成LEFT
 config ZMK_SPLIT_BLE_ROLE_CENTRAL
 	default y
 
+# 有if就必须有endif，一一对应
 endif
 
+# 两只手一起定义
 if SHIELD_OFFSETKEY_LEFT || SHIELD_OFFSETKEY_RIGHT
 
+# 是否为分体键盘
 config ZMK_SPLIT
 	default y
 	
 endif
 
+# 定义屏幕显示
 if ZMK_DISPLAY
 
+# SSD3610 OELD屏幕信号走I2C通道
 config I2C
     default y
 
+# 使用SSD1306屏幕驱动
 config SSD1306
     default y
 
+# 选择专用的屏幕更新线程
 choice ZMK_DISPLAY_WORK_QUEUE
     default ZMK_DISPLAY_WORK_QUEUE_DEDICATED
 endchoice
 
 endif
+
+# 屏幕参数设置，分辨率啥的
 if LVGL
 
 config LV_Z_VDB_SIZE
@@ -46,7 +58,7 @@ endchoice
 endif
 
 
-
+# 屏幕背光设置
 if ZMK_BACKLIGHT
 
 config PWM
@@ -58,7 +70,7 @@ config LED_PWM
 endif # ZMK_BACKLIGHT
 
 
-
+# 下面这俩是启用主控板的DCDC电路，更省电。如果没有焊接对应的元件，请勿启用
 config BOARD_ENABLE_DCDC
     bool "Enable DCDC mode"
     select SOC_DCDC_NRF52X

@@ -1,41 +1,59 @@
+// 给layer数字命名，对应下方keymap内4个layer
 #define BASE 0
 #define LOWER 1
 #define MOUSE_KEYS 2
 #define MOUSE_TP 3
-#define MOUSE_TP_SET 4
+#define MOUSE_TP_SET 4 // 暂未使用的layer
 
+// 以下内容大部分都可以通过keymap editor工具，图形化设置键值后自动生成，不需要在这里改
+// 个别引用第三方库的代码，比如轨迹球相关的代码，可以在使用keymap editor做了基础设置之后，自行对比抄的仓库范本，增加缺失的代码
+/* ====================== ZMK 官方头文件引入 ====================== */
+// 输入设备事件码基础定义
 #include <zephyr/dt-bindings/input/input-event-codes.h>
+// IO开关类行为：单独点亮/关闭IO引脚
 #include <behaviors/toggle_io.dtsi>
 #include <behaviors/on_io.dtsi>
 #include <behaviors/off_io.dtsi>
+// ZMK内置全部基础行为（按键、层切换、鼠标、RGB等）总头文件
 #include <behaviors.dtsi>
+// 蓝牙相关指令宏：设备切换、清除配对
 #include <dt-bindings/zmk/bt.h>
+// 标准键盘按键码（字母、数字、符号、功能键）
 #include <dt-bindings/zmk/keys.h>
+// 指点设备相关：鼠标移动、鼠标左右中键
 #include <dt-bindings/zmk/pointing.h>
+// RGB灯带控制指令：亮度、色相、饱和度、切换效果等
 #include <dt-bindings/zmk/rgb.h>
 
 / {
+    /* ---------------------- 自定义行为节点 behaviors ---------------------- */
     behaviors {
+        // 自定义Layer-Tap层切换行为：长按激活层，短按输出按键，Layer-Tap是Hold-Tap的一种特定类型，长按的键值只能设置为切层
         ltq: ltq {
-            compatible = "zmk,behavior-hold-tap";
-            label = "LTQ";
-            bindings = <&mo>, <&kp>;
-
-            #binding-cells = <2>;
-            tapping-term-ms = <200>;
-            quick-tap-ms = <180>;
+            compatible = "zmk,behavior-hold-tap"; // 行为类型：按住切换层/轻按输出按键
+            label = "LTQ";                         // 行为标识，代码内引用&ltq
+            bindings = <&mo>, <&kp>;               // 两种模式：长按=瞬时激活层mo，轻按=普通按键kp
+            #binding-cells = <2>;                  // 该行为需要2个参数：层号 + 短按按键
+            tapping-term-ms = <200>;               // 判定长按/短按阈值：按住超过200ms触发层切换
+            quick-tap-ms = <180>;                  // 快速连击判定窗口，双击/三击不触发hold逻辑
         };
     };
 
+    /* ---------------------- 组合键 combos 配置 ---------------------- */
     combos {
-        compatible = "zmk,combos";
+        compatible = "zmk,combos"; // 固定标识：启用组合键功能
 
+        // 进入DFU刷机模式组合键
         flash {
-            bindings = <&bootloader>;
-            key-positions = <0 11>;
+            bindings = <&bootloader>;    // 触发动作：重启进入bootloader刷机模式
+            key-positions = <0 11>;     // 键盘物理键位0、11同时按下触发
         };
     };
 
+    /* ---------------------- keymap键值设置 ---------------------- */
+    // 这些都在keymap editor里可以设置。做别的键盘的时候，可以只保留一层，剩下的都删掉
+    // 然后按键的数量按照实际键值数量增删，只要数量对了，键值不用管，全用&kp A 都行
+    // 做完这些，再把这一层按需复制粘贴几次，最后到keymap editor里面修改，比在这里一个一个搓代码方便多了。
     keymap {
         compatible = "zmk,keymap";
 
@@ -49,7 +67,6 @@
 &kp UP_ARROW  &kp LEFT_ARROW  &kp RIGHT_ARROW  &kp DOWN_ARROW  &kp ENTER  &kp C_MUTE              &mkp MB1  &mkp MB3   &mkp MB2       &none
             >;
 
-            label = "BASE";
             sensor-bindings = <&inc_dec_kp C_VOLUME_DOWN C_VOLUME_UP>;
         };
 

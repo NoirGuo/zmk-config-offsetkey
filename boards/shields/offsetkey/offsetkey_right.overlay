@@ -1,8 +1,12 @@
+// 右手的硬件设置
+// 版权和开源协议说明
 /*
  * Copyright (c) 2020 ZMK Contributors
  *
  * SPDX-License-Identifier: MIT
  */
+
+// 引用的库文件，<>的是官方库和第三方库的硬件配置、定义之类，""的是本仓库内的基础硬件配置
 #include <dt-bindings/zmk/input_transform.h>
 #include <dt-bindings/led/led.h>
 #include <input/processors.dtsi>
@@ -13,15 +17,26 @@
 #include <input/processors/runtime-input-processor.dtsi>
 
 / {
+    // chosen是Zephyr的标准写法
 	chosen {
+        // 指定 led_strip 设备作为键盘底灯
         zmk,underglow = &led_strip;
     };
 
 
+    // 按键扫描定义1
     kscan1: kscan {
+
+        // 支持键盘唤醒
         wakeup-source;
+        // 二极管方向列到行
         diode-direction = "col2row";
+        // 使用矩阵扫描驱动
         compatible = "zmk,kscan-gpio-matrix";
+
+        // 行列gpio定义，按照原理图修改数量和引脚编号
+        // col2row模式，row gpio 高电平有效+下拉；col gpio 高电平有效。row2col模式要反过来
+        // 注意最后一个要用分号分隔，其他的用逗号分隔
         row-gpios
             = <&gpio0 11 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
             , <&gpio0 23 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
@@ -43,7 +58,9 @@
             ;
     };
 
+    // 按键扫描定义2
     kscan2: kscan_direct {
+        // 使用直连扫描驱动
         compatible = "zmk,kscan-gpio-direct";
         wakeup-source;
         input-gpios
@@ -55,8 +72,11 @@
             , <&gpio0 9 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
             ;
     };
-//only 1.04 1.07 remain
+
+    // 按键扫描定义0
+    //only 1.04 1.07 remain
     kscan0: kscan_composite {
+        // 使用复合扫描驱动，下面会引用kscan1和kscan2
         compatible = "zmk,kscan-composite";
          wakeup-source;
         rows = <6>;
@@ -76,12 +96,14 @@
     };
 };
 
+// 矩阵列偏移，因为左手使用了9列，右手设置偏移防止按键冲突
 &default_transform {
 	col-offset = <9>;
 };
 
+// === 引脚控制配置 ===
 &pinctrl {
-
+    // spi3驱动，WS2812 RGB灯珠走spi协议，配置正常工作模式和休眠模式。只改引脚编号即可
     spi3_default: spi3_default {
         group1 {
             psels = <NRF_PSEL(SPIM_MOSI, 1, 8)>; // WS2812_VEXT_DATA
@@ -96,17 +118,26 @@
     };
 };
 
+// === 轨迹球配置，基本不用改 ===
 / {
+    // 轨迹球监听节点
     trackball_listener {
+        // 状态为启用
         status = "okay";
+        // 调用input-listener驱动
         compatible = "zmk,input-listener";
+        // 监听设备是轨迹球
         device = <&trackball>;
+        // 输入事件是鼠标实时移动
         input-processors = <&mouse_runtime_input_processor>;
-
+        // 鼠标滚动设置
         scroller {
+            // 仅在layer2生效
             layers = <2>;
+            // 把鼠标xy位移事件转化为垂直/水平滚轮滚动事件
             input-processors =
                 <&zip_xy_to_scroll_mapper &scroll_runtime_input_processor>,
+                // 翻转Y轴
                 <&zip_scroll_transform INPUT_TRANSFORM_Y_INVERT>;
         };
     };

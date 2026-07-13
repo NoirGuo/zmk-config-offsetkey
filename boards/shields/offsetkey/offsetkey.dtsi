@@ -1,23 +1,27 @@
+// 引用的库文件，<>的是官方库和第三方库的硬件配置、定义之类，""的是本仓库内的基础硬件配置
 #include <dt-bindings/zmk/matrix_transform.h>
 #include  "offsetkey_physical_layout.dtsi"
 #include <dt-bindings/led/led.h>
 
-
-
-#include <dt-bindings/zmk/matrix_transform.h>
-#include  "offsetkey_physical_layout.dtsi"
-
-
 / {
      chosen {
+        // 绑定物理布局定义
         zmk,physical-layout = &offsetkey_physical_layout;
+        // 使用OLED屏幕
         zephyr,display = &oled;
+        // 使用按键扫描定义kscan0
         zmk,kscan = &kscan0;
+        // 使用键盘背光
         zmk,backlight = &backlight;
     };
 
+// === 键盘背光设置 ===
+// 键盘背光节点
 backlight: pwmleds {
+    // 使用pwm-leds驱动
     compatible = "pwm-leds";
+    // 0和2被注释禁用，只启用1
+    // 周期 1ms、正常极性
    // pwm_led_0: pwm_led_0 {
    //     pwms = <&pwm0 0 PWM_MSEC(1) PWM_POLARITY_NORMAL>;
   //  };
@@ -28,13 +32,23 @@ backlight: pwmleds {
    //     pwms = <&pwm0 2 PWM_MSEC(1) PWM_POLARITY_NORMAL>;
   //  };
 };
+
+    // 左旋钮编码器节点
 	left_encoder: encoder_left {
+        // 使用ec11驱动，基本上各种编码器都用这个驱动就行，包括但不限于普通旋钮编码器，松下滚轮编码器，鼠标滚轮编码器等
 		compatible = "alps,ec11";
+        // 标签定义
 		label = "LEFT_ENCODER";
+        // 脉冲和步进数，关系到鼠标的灵敏度，数值设置不正确，可能造成旋转速度过快或过慢，影响手感
+        // 具体数值需要看自己买的旋转编码器的规格书，如果没有规格书就找卖家问清楚
+        // 脉冲数，每旋转一格发出4个脉冲
 		resolution = <4>;
+        // 步进数，旋转一圈有40格
         steps = <40>;
+        // AB相引脚定义
         a-gpios = <&gpio1 0 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
 	    b-gpios = <&gpio0 25 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
+        // 默认不启用，在对应的overlay文件中启用
 		status = "disabled";
 	};
 

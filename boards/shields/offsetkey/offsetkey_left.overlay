@@ -1,21 +1,38 @@
+// 左手的硬件设置
+// 版权和开源协议说明，删掉不影响固件编译，特别是国内好多人都不怎么在乎版权，我抄过来就用，你抄完了也随便用。至于官方追不追究版权问题，对于咱们这种主要是自用的小卡拉咪，人家也不怎么关注
 /*
  * Copyright (c) 2020 ZMK Contributors
  *
  * SPDX-License-Identifier: MIT
  */
+
+// 引用的库文件，<>的是官方库和第三方库的硬件配置、定义之类，""的是本仓库内的基础硬件配置
 #include <dt-bindings/led/led.h>
 #include <behaviors/battery_history_request.dtsi>
 #include "offsetkey.dtsi"
 
 / {
+
+    // chosen是Zephyr的标准写法
+
 	chosen {
+        // 指定 led_strip 设备作为键盘底灯
         zmk,underglow = &led_strip;
     };
 
+    // 按键扫描定义1
     kscan1: kscan {
+
+        // 支持键盘唤醒
         wakeup-source;
+        // 二极管方向列到行
         diode-direction = "col2row";
+        // 使用矩阵扫描驱动
         compatible = "zmk,kscan-gpio-matrix";
+
+        // 行列gpio定义，按照原理图修改数量和引脚编号
+        // col2row模式，row gpio 高电平有效+下拉；col gpio 高电平有效。row2col模式要反过来
+        // 注意最后一个要用分号分隔，其他的用逗号分隔
         row-gpios
             = <&gpio0 12 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
             , <&gpio0 11 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
@@ -34,7 +51,9 @@
             ;
     };
 
+    // 按键扫描定义2
     kscan2: kscan_direct {
+        // 使用直连扫描驱动
         compatible = "zmk,kscan-gpio-direct";
         wakeup-source;
         input-gpios
@@ -47,7 +66,9 @@
             ;
     };
 
+    // 按键扫描定义0
     kscan0: kscan_composite {
+        // 使用复合扫描驱动，下面会引用kscan1和kscan2
         compatible = "zmk,kscan-composite";
   wakeup-source;
         rows = <6>;
@@ -66,12 +87,14 @@
     };
 };
 
+// 左手旋钮设置，状态为启用
 &left_encoder {
     status = "okay";
 };
 
+// 引脚控制配置
 &pinctrl {
-
+    // spi3驱动，WS2812 RGB灯珠走spi协议，配置正常工作模式和休眠模式。只改引脚编号即可
     spi3_default: spi3_default {
         group1 {
             psels = <NRF_PSEL(SPIM_MOSI, 0, 22)>; // WS2812_VEXT_DATA
@@ -86,4 +109,5 @@
     };
 };
 
+// 引用本仓库内独立的RGB灯带配置文件
 #include "rgb.dtsi"
