@@ -1,6 +1,8 @@
+// 这个文件是当轨迹球在副手时使用的，offsetkey默认版本是轨迹球在主手，用不到这个文件。dongle版本会引用这个文件
+// 引用官方仓库定义
 #include <dt-bindings/zmk/input_transform.h>
 #include <input/processors.dtsi>
-
+// 定义键盘层名称，可以删掉，跟keymap里有冲突
 #define DEFAULT 0
 #define WIN 1
 #define SYMBOLS 2
@@ -13,21 +15,25 @@
 #define SCRL 9
 #define BIRO 10
 
+// 输入转发节点
 / {
   split_inputs {
     #address-cells = <1>;
     #size-cells = <0>;
 
+    // 轨迹球1
     trackball_split: trackball_split@0 {
       compatible = "zmk,input-split";
       reg = <0>;
     };
+    // 轨迹球2
     trackball_split2: trackball_split2@1 {
       compatible = "zmk,input-split";
       reg = <1>;
     };
   };
 
+  // 轨迹球监听节点1
   trackball_listener: trackball_listener {
     compatible = "zmk,input-listener";
     status = "disabled";
@@ -40,12 +46,12 @@
 
   };
 
+  // 轨迹球监听节点2
   trackball_listener2: trackball_listener2 {
     compatible = "zmk,input-listener";
     status = "disabled";
     device = <&trackball_split2>;
     input-processors = <&zip_xy_transform (INPUT_TRANSFORM_XY_SWAP)>;
-
     scroll {
       layers = <DEFAULT>;
       input-processors = <&zip_xy_transform (INPUT_TRANSFORM_Y_INVERT | INPUT_TRANSFORM_XY_SWAP)>, <&zip_xy_scaler 1 10>, <&zip_xy_to_scroll_mapper>;

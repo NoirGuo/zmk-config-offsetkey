@@ -39,11 +39,10 @@ backlight: pwmleds {
 		compatible = "alps,ec11";
         // 标签定义
 		label = "LEFT_ENCODER";
-        // 脉冲和步进数，关系到鼠标的灵敏度，数值设置不正确，可能造成旋转速度过快或过慢，影响手感
-        // 具体数值需要看自己买的旋转编码器的规格书，如果没有规格书就找卖家问清楚
-        // 脉冲数，每旋转一格发出4个脉冲
+        // 脉冲数和定位数，是旋钮的基础参数，具体数值需要看自己买的旋转编码器的规格书，如果没有规格书就找卖家问清楚
+        // 每旋转一格AB相边沿采样数，=脉冲数*4/定位数
 		resolution = <4>;
-        // 步进数，旋转一圈有40格
+        // 定位数，旋转一圈有40格
         steps = <40>;
         // AB相引脚定义
         a-gpios = <&gpio1 0 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
@@ -52,18 +51,23 @@ backlight: pwmleds {
 		status = "disabled";
 	};
 
+    //传感器节点
     sensors {
+        // 使用sensors驱动
 		compatible = "zmk,keymap-sensors";
+        // 每圈触发按键动作数，现在代码里一圈有40格，如果触发20次动作，意思就是每2格触发一次动作，有一点慢，但是我个人习惯是一次拧两格，所以就还好
         triggers-per-rotation = <20>;
 		sensors = <&left_encoder>;
 	};
 
+    // 矩阵定义
     default_transform: keymap_transform_0 {
+        // 使用矩阵转换
 		compatible = "zmk,matrix-transform";
-       
+        // 总列数和总行数
         columns = <19>;
         rows = <6>;
-
+        // 每个按键所在的行/列。前5行是标准矩阵变换的按键，第6行是direct pin的按键
         map = <
             RC(0,0) RC(0,1) RC(0,2) RC(0,3) RC(0,4) RC(0,5) RC(0,6)            RC(0,9) RC(0,10) RC(0,11) RC(0,12) RC(0,13) RC(0,14) RC(0,15) RC(0,16) RC(0,18)
             RC(1,0) RC(1,1) RC(1,2) RC(1,3) RC(1,4) RC(1,5)                    RC(1,9) RC(1,10) RC(1,11) RC(1,12) RC(1,13) RC(1,14) RC(1,15) RC(1,16) RC(1,17) RC(1,18)
@@ -75,34 +79,46 @@ backlight: pwmleds {
     };
 };    
 
+// i2c节点
 &i2c0 {
 	status = "okay";
 	compatible = "nordic,nrf-twi";
     pinctrl-0 = <&i2c0_default>;
     pinctrl-1 = <&i2c0_sleep>;
+    // offsetkey默认屏幕模块使用的是0.91英寸OLED屏幕，ssd1306驱动，如果是别的屏幕，比如1.3英寸屏幕用的是sh1106驱动，需要把下面两行修改成对应的型号
     oled: ssd1306@3c {
+        // 引号内的屏幕型号详见Zephyr相关页面https://docs.zephyrproject.org/4.1.0/build/dts/api/bindings.html
         compatible = "solomon,ssd1306fb";
         reg = <0x3c>;
+        // 屏幕分辨率，宽128，高32
         width = <128>;
         height = <32>;
+        // 下面四行一般不修改
         segment-offset = <0>;
         page-offset = <0>;
         display-offset = <0>;
+        // 多路复用比率，0到31，共32行
         multiplex-ratio = <31>;
+        // 下面四行调整画面用
+        // 水平翻转
         segment-remap;
+        // 垂直翻转
         com-invdir;
+        // 画面顺序扫描
         com-sequential;
+        // 像素反转
         inversion-on;
+        // 这个不修改
         prechargep = <0x22>;
     };
 };
 
-
-
+// 引脚控制配置，这一段是backlight键盘背光的引脚配置，一般人用不到，可删
 &pinctrl {
     // Other Pinctrl definitions go here
     pwm0_default: pwm0_default {
         group1 {
+            // 括号里面的0, 27是引脚编号，前面的1是PWM_OUT1
             psels = //<NRF_PSEL(PWM_OUT0, 1, 3)>, 
                     <NRF_PSEL(PWM_OUT1, 0, 27)>; // LED 1
                    // <NRF_PSEL(PWM_OUT2, 1, 2)>; LED 2

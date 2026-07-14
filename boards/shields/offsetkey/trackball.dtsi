@@ -1,3 +1,5 @@
+// 这是轨迹球的硬件配置文件
+// 输入事件定义，这部分不要改
 #define INPUT_EV_KEY 0x01               /**< Key event */
 #define INPUT_EV_REL 0x02               /**< Relative coordinate event */
 #define INPUT_EV_ABS 0x03               /**< Absolute coordinate event */
@@ -11,10 +13,13 @@
 #define INPUT_REL_HWHEEL 0x06           /**< Relative horizontal wheel coordinate */
 #define INPUT_REL_MISC 0x09             /**< Relative misc coordinate */
 
+// 引脚控制配置
 &pinctrl {
     spi1_default: spi1_default {
         group1 {
+                // 对应3610传感器SCLK引脚
                 psels = <NRF_PSEL(SPIM_SCK, 1, 0)>,
+                // MOSI和MISO使用相同引脚，对应3610传感器SDIO引脚
                 <NRF_PSEL(SPIM_MOSI, 0, 24)>,
                 <NRF_PSEL(SPIM_MISO, 0, 24)>;
         };
@@ -22,6 +27,7 @@
 
     spi1_sleep: spi1_sleep {
         group1 {
+            // 同步上面的修改
             psels = <NRF_PSEL(SPIM_SCK, 1, 0)>,
                 <NRF_PSEL(SPIM_MOSI, 0, 24)>,
                 <NRF_PSEL(SPIM_MISO, 0, 24)>;
@@ -36,18 +42,23 @@
     pinctrl-0 = <&spi1_default>;
     pinctrl-1 = <&spi1_sleep>;
     pinctrl-names = "default", "sleep";
+    // 对应3610传感器NCS引脚
     cs-gpios = <&gpio0 25 GPIO_ACTIVE_LOW>;
 
     trackball: trackball@0 {
         status = "okay";
         compatible = "pixart,pmw3610";
         reg = <0>;
+        // SPI通信速率2MHz，不建议修改
         spi-max-frequency = <2000000>;
+        // 对应3610传感器MOTION引脚
         irq-gpios = <&gpio0 10 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        // 数值越大光标移动越快
         cpi = <1600>;
         evt-type = <INPUT_EV_REL>;
         x-input-code = <INPUT_REL_X>;
         y-input-code = <INPUT_REL_Y>;
+        // 强制唤醒不休眠，保证轨迹球实时响应，但会增加键盘功耗
         force-awake;
     };
 };
