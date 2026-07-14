@@ -7,6 +7,7 @@
  */
 
 // 引用的库文件，<>的是官方库和第三方库的硬件配置、定义之类，""的是本仓库内的基础硬件配置
+// 如果有用不到的功能，删除代码的同时，也要删除对应的引用，以免报错
 #include <dt-bindings/zmk/input_transform.h>
 #include <dt-bindings/led/led.h>
 #include <input/processors.dtsi>
